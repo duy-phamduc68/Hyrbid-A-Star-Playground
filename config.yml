@@ -1,0 +1,128 @@
+planner:
+  path_model: RS # RS / Dubins
+
+environment:
+  json_file: scenario.json
+  width: 500
+  height: 500
+  grid_size: 5
+  yaw_resolution_deg: 5
+
+vehicle:
+  length: 50
+  width: 20
+  wheel_base: 40
+
+kinematics:
+  v_max: 100
+  steer_max_deg: 35
+  dt: 0.1
+
+animation:
+  enable_search_animation: true
+  delay_search: 0.0
+  delay_snake: 0.0
+  enable_final_path_animation: true
+  final_path_speed: 2.0
+  search_render_every: 40
+  snake_render_every: 3
+
+smoothing:
+  enabled: true
+  min_points: 3
+  iterations: 150
+  data_weight: 0.20
+  smoothness_weight: 0.35
+  obstacle_weight: 0.90
+  curvature_weight: 0.60
+  safety_buffer: 16.0
+  max_step: 2.0
+
+search:
+  h_cost_weight: 1.5
+  min_g_improvement: 0.75
+  sniper_trigger_radius: 500.0
+
+steering:
+  multipliers: [-1.0, 0.0, 1.0]
+
+sampling:
+  kinematic_substeps: 3
+  analytic_step_px: 5.0
+  min_chunks: 1
+
+numeric:
+  angle_wrap_deg: 360.0
+  tiny_epsilon: 1.0e-9
+
+dilation:
+  # Collision-level dilation radius (used for H2D free-space and collision grid gate).
+  # Typical formula: vehicle.width / 2
+  collision_radius: 10.0
+  # Visualization-level dilation radius (used for dim dilation overlay cells).
+  # Typical formula: sqrt((vehicle.length/2)^2 + (vehicle.width/2)^2)
+  overlay_radius: 26.93
+
+penalties:
+  reverse: 1.2
+  gear_shift: 15.0
+  steer: 0.0
+
+proximity:
+  penalty_weight: 0.030
+  wall_buffer: 20.0
+  car_buffer: 15.0
+
+goal_tolerance:
+  distance: 15.0
+  yaw_deg: 10.0
+
+render:
+  figure_size: [10, 10]
+  figure_dpi: 120
+  title_color: "white"
+  color_start: "#65bfff"
+  color_goal: "#ff8e32"
+  color_ghost: "#e34234"
+  color_trail_forward: "cyan"
+  color_trail_reverse: "orange"
+  color_snake_forward: "#ff00ff"
+  color_snake_reverse: "#c0392f"
+  color_snake_line_forward: "white"
+  color_background: "#2b2b2b"
+  base_obstacle_color: "#ffffff"
+  rasterized_cont_obstacle_color: "#9aa3ab"
+  rasterized_cont_obstacle_alpha: 0.45
+  dilation_color: "black"
+  cont_obstacle_color: "#ffffff"
+  h2d_cmap: "viridis_r"
+  h2d_interpolation: "nearest"
+  car_text_color: "black"
+
+  start_goal_alpha: 0.5
+  trail_alpha: 0.3
+  trail_linewidth: 1.0
+  trail_zorder: 3
+  ghost_alpha: 0.75
+  ghost_arrow_alpha: 0.78
+  snake_body_alpha: 0.15
+  snake_linewidth: 2.0
+  bad_cell_alpha: 1.0
+
+  arrow_head_width: 5.0
+  arrow_head_length: 5.0
+  car_linewidth: 2.0
+  cell_linewidth: 0.0
+
+  zorder_heatmap: 1
+  zorder_base_obstacle: 2
+  zorder_dilation: 3
+  zorder_cont_obstacle: 4
+  zorder_snake_line: 5
+  zorder_car_rect: 6
+  zorder_car_arrow: 7
+  zorder_car_text: 8
+
+  h2d_alpha: 0.45
+  dilation_alpha: 0.32
+  cont_obstacle_alpha: 0.6
