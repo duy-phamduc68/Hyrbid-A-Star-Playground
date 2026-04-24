@@ -24,11 +24,11 @@ animation:
   delay_snake: 0.0
   enable_final_path_animation: true
   final_path_speed: 2.0
-  search_render_every: 40
+  search_render_every: 50
   snake_render_every: 3
 
 smoothing:
-  enabled: true
+  enabled: false
   min_points: 3
   iterations: 150
   data_weight: 0.20
@@ -41,7 +41,7 @@ smoothing:
 search:
   h_cost_weight: 1.5
   min_g_improvement: 0.75
-  sniper_trigger_radius: 500.0
+  sniper_trigger_radius: 200.0
 
 steering:
   multipliers: [-1.0, 0.0, 1.0]
@@ -56,12 +56,31 @@ numeric:
   tiny_epsilon: 1.0e-9
 
 dilation:
-  # Collision-level dilation radius (used for H2D free-space and collision grid gate).
-  # Typical formula: vehicle.width / 2
+  # Collision-level radius (inscribed circle).
+  # Used for fast rejection: if center distance <= this → guaranteed collision.
+  # Base formula: vehicle.width / 2
   collision_radius: 10.0
-  # Visualization-level dilation radius (used for dim dilation overlay cells).
-  # Typical formula: sqrt((vehicle.length/2)^2 + (vehicle.width/2)^2)
+
+  # Overlay / SAT-trigger radius (circumscribed circle).
+  # Used for fast acceptance: if center distance >= this → guaranteed safe (before margin).
+  # Base formula: sqrt((vehicle.length/2)^2 + (vehicle.width/2)^2)
   overlay_radius: 26.93
+
+  # Discretization safety margin (CRITICAL, not a tuning knob).
+  # Accounts for the fact that distance is measured from grid cell centers,
+  # while the true vehicle center can lie anywhere within the cell.
+  #
+  # Exact worst-case spatial error:
+  #   margin = sqrt(2) / 2 * grid_size
+  #
+  # This guarantees:
+  # - No missed collisions due to grid discretization (no false negatives from d)
+  # - Expands collision zone and shrinks safe zone accordingly
+  #
+  # NOTE:
+  # - This does NOT account for motion/sampling gaps (handled separately via kinematic_substeps)
+  # - Should NOT be tuned arbitrarily; derived from grid resolution
+  margin: 3.53
 
 penalties:
   reverse: 1.2

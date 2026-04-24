@@ -11,7 +11,7 @@ from rendering import draw_car_center, draw_static_scene, refresh_canvas, set_fi
 
 from ..algorithms.analytic_paths import RS_AVAILABLE, generate_analytic_samples, get_analytic_cost
 from ..core.environment import compute_dilated_overlay_cells, compute_h2d, precompute_environment
-from ..core.geometry import center_to_rear_axle, collides_state, obstacle_proximity_penalty, rear_axle_to_center
+from ..core.geometry import center_to_rear_axle, collides_state, get_car_corners, obstacle_proximity_penalty, rear_axle_to_center
 from ..core.kinematics import kinematic_expansion
 from ..core.node import Node
 from ..core.smoothing import smooth_path_gradient_descent
@@ -287,12 +287,33 @@ class HybridAStarPlanner:
 
     def _samples_collide(self, px, py, pyaw, dist_grid, base_obs, cont_obs_polys) -> bool:
         for s_rx, s_ry, s_yaw in zip(px, py, pyaw):
-            c = int(s_rx // self.cfg.grid_size)
-            r = int(s_ry // self.cfg.grid_size)
+            # covert to center
+            cx, cy = rear_axle_to_center(self.cfg, s_rx, s_ry, s_yaw)
+        
+            c = int(cx // self.cfg.grid_size)
+            r = int(cy // self.cfg.grid_size)
+        
+            # bound check
+            corners = get_car_corners(self.cfg, s_rx, s_ry, s_yaw)
+            for x, y in corners:
+                if x < 0 or x > self.cfg.width or y < 0 or y > self.cfg.height:
+                    return True
+        
+            # grid bounds
             if not (0 <= c < self.cfg.cols and 0 <= r < self.cfg.rows):
                 return True
-            if dist_grid[r, c] <= self.cfg.collision_dilation_radius:
+        
+            d = dist_grid[r, c]
+        
+            # guaranteed collision
+            if d <= self.cfg.inscribed_rad:
                 return True
+        
+            # guaranteed safe -> skip SAT
+            if d >= self.cfg.circumscribed_rad:
+                continue
+            
+            # uncertain -> SAT check (includes obstacle polygons + grid cells)
             if collides_state(self.cfg, s_rx, s_ry, s_yaw, base_obs, cont_obs_polys):
                 return True
         return False

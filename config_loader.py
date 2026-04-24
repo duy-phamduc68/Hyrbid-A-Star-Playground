@@ -56,8 +56,9 @@ class Config:
     angle_wrap_deg: float
     tiny_epsilon: float
 
-    collision_dilation_radius: float
-    overlay_dilation_radius: float
+    # These are loaded DIRECTLY from YAML (Base + Margin)
+    collision_dilation_radius: float 
+    overlay_dilation_radius: float   
 
     penalty_reverse: float
     penalty_gear_shift: float
@@ -132,21 +133,23 @@ class Config:
     def rear_overhang(self) -> float:
         return (self.car_l - self.wheel_base) / 2.0
 
+    # COMPATIBILITY PROPERTIES
+    # These return the FINAL calculated values (Base YAML + Margin)
     @property
     def inscribed_rad(self) -> float:
-        return self.car_w / 2.0
+        return self.collision_dilation_radius
 
     @property
     def circumscribed_rad(self) -> float:
-        return math.hypot(self.car_l / 2.0, self.car_w / 2.0)
+        return self.overlay_dilation_radius
 
     @property
     def min_turn_rad(self) -> float:
         return self.wheel_base / math.tan(math.radians(self.steer_max_deg))
 
 
-
 def load_config(config_path: Path) -> Config:
+    print(f"--- Loading Config from {config_path} ---")
     with config_path.open("r", encoding="utf-8") as f:
         raw = yaml.safe_load(f)
 
@@ -169,6 +172,23 @@ def load_config(config_path: Path) -> Config:
     render = raw["render"]
 
     json_file = (cfg_dir / env["json_file"]).resolve()
+
+    # 1. Get Base Radii from YAML
+    base_collision_rad = float(dilation["collision_radius"])
+    base_overlay_rad = float(dilation["overlay_radius"])
+    
+    # 2. Get Margin (Default to 0.0 if not present)
+    margin = float(dilation.get("margin", 0.0))
+
+    # 3. Apply Margin
+    final_collision_rad = base_collision_rad + margin
+    final_overlay_rad = base_overlay_rad + margin
+
+    print(f"[VEHICLE] L={float(vehicle['length'])}, W={float(vehicle['width'])}")
+    print(f"[DILATION] Base Collision: {base_collision_rad} | Base Overlay: {base_overlay_rad}")
+    print(f"[DILATION] Margin: {margin}")
+    print(f"[INJECTED] Final Inscribed Rad (Collision): {final_collision_rad}")
+    print(f"[INJECTED] Final Circumscribed Rad (Overlay): {final_overlay_rad}")
 
     return Config(
         path_model=str(planner["path_model"]).upper(),
@@ -208,8 +228,11 @@ def load_config(config_path: Path) -> Config:
         analytic_min_chunks=int(sampling["min_chunks"]),
         angle_wrap_deg=float(numeric["angle_wrap_deg"]),
         tiny_epsilon=float(numeric["tiny_epsilon"]),
-        collision_dilation_radius=float(dilation["collision_radius"]),
-        overlay_dilation_radius=float(dilation["overlay_radius"]),
+        
+        # Injecting the FINAL values (Base + Margin)
+        collision_dilation_radius=final_collision_rad,
+        overlay_dilation_radius=final_overlay_rad,
+        
         penalty_reverse=float(penalties["reverse"]),
         penalty_gear_shift=float(penalties["gear_shift"]),
         penalty_steer=float(penalties["steer"]),
