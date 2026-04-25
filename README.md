@@ -6,7 +6,7 @@ Check out the technical breakdown here:
 
 - [Blog post (Coming soon)](https://yuk068.github.io/)
 
-![example usage](media/example_usage.gif)
+<img alt="hybrid a star" src="https://raw.githubusercontent.com/duy-phamduc68/Hyrbid-A-Star-Playground/main/media/example_usage.gif" width="100%">
 
 ## Scenario Builder
 
