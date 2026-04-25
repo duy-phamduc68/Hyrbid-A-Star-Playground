@@ -1,5 +1,5 @@
 planner:
-  path_model: RS # RS / Dubins
+  path_model: RS
 
 environment:
   json_file: scenario.json
@@ -31,15 +31,15 @@ animation:
   snake_render_every: 3
 
 smoothing:
-  enabled: false
+  enabled: true
   min_points: 3
-  iterations: 150
-  data_weight: 0.20
-  smoothness_weight: 0.35
-  obstacle_weight: 0.90
-  curvature_weight: 0.60
-  safety_buffer: 16.0
-  max_step: 2.0
+  iterations: 250
+  data_weight: 0.10
+  smoothness_weight: 0.60
+  obstacle_weight: 0.75
+  curvature_weight: 0.80
+  safety_buffer: 18.0
+  max_step: 3.0
 
 search:
   h_cost_weight: 1.5
@@ -47,42 +47,8 @@ search:
   sniper_trigger_radius: 200.0
 
 sampling:
-  # Number of integration substeps used inside one kinematic expansion (one search edge).
-  # The total motion duration per node is still dt.
-  # This only refines numerical integration of the vehicle motion.
-  #
-  # Higher value:
-  # - smoother arcs
-  # - more accurate curvature
-  # - denser collision sampling along the same trajectory
-  #
-  # Does NOT change:
-  # - number of nodes
-  # - branching factor
-  # - step horizon (dt)
   kinematic_substeps: 3
-
-  # Distance (in pixels) between sampled points when constructing analytic (Reeds-Shepp / Dubins)
-  # or hybrid shortcut trajectories.
-  #
-  # Used for:
-  # - discretizing continuous analytic curves into collision-checkable points
-  # - ensuring SAT / grid collision checks are not skipped between sparse samples
-  #
-  # Smaller value:
-  # - higher fidelity
-  # - slower evaluation
-  #
-  # Larger value:
-  # - faster but coarser approximation
   analytic_step_px: 5.0
-
-  # Minimum number of discrete segments ("chunks") required for an analytic path.
-  #
-  # Ensures even very short analytic paths are not under-sampled.
-  # Prevents degenerate cases where a shortcut becomes a single unsafely-large jump.
-  #
-  # Acts as a lower bound on discretization resolution, not a motion parameter.
   min_chunks: 1
 
 numeric:
@@ -90,30 +56,8 @@ numeric:
   tiny_epsilon: 1.0e-9
 
 dilation:
-  # Collision-level radius (inscribed circle).
-  # Used for fast rejection: if center distance <= this → guaranteed collision.
-  # Base formula: vehicle.width / 2
   collision_radius: 10.0
-
-  # Overlay / SAT-trigger radius (circumscribed circle).
-  # Used for fast acceptance: if center distance >= this → guaranteed safe (before margin).
-  # Base formula: sqrt((vehicle.length/2)^2 + (vehicle.width/2)^2)
   overlay_radius: 26.93
-
-  # Discretization safety margin (CRITICAL, not a tuning knob).
-  # Accounts for the fact that distance is measured from grid cell centers,
-  # while the true vehicle center can lie anywhere within the cell.
-  #
-  # Exact worst-case spatial error:
-  #   margin = sqrt(2) / 2 * grid_size
-  #
-  # This guarantees:
-  # - No missed collisions due to grid discretization (no false negatives from d)
-  # - Expands collision zone and shrinks safe zone accordingly
-  #
-  # NOTE:
-  # - This does NOT account for motion/sampling gaps (handled separately via kinematic_substeps)
-  # - Should NOT be tuned arbitrarily; derived from grid resolution
   margin: 3.53
 
 penalties:
