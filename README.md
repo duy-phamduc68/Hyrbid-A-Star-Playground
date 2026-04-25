@@ -6,6 +6,8 @@ Check out the technical breakdown here:
 
 - [Blog post (Coming soon)](https://yuk068.github.io/)
 
+![example usage](media/example_usage.gif)
+
 ## Scenario Builder
 
 You can create your own scenarios using:

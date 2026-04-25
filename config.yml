@@ -13,6 +13,9 @@ vehicle:
   width: 20
   wheel_base: 40
 
+steering:
+  multipliers: [-1.0, 0.0, 1.0]
+
 kinematics:
   v_max: 100
   steer_max_deg: 35
@@ -22,7 +25,7 @@ animation:
   enable_search_animation: true
   delay_search: 0.0
   delay_snake: 0.0
-  enable_final_path_animation: true
+  enable_final_path_animation: false
   final_path_speed: 2.0
   search_render_every: 50
   snake_render_every: 3
@@ -43,12 +46,43 @@ search:
   min_g_improvement: 0.75
   sniper_trigger_radius: 200.0
 
-steering:
-  multipliers: [-1.0, 0.0, 1.0]
-
 sampling:
+  # Number of integration substeps used inside one kinematic expansion (one search edge).
+  # The total motion duration per node is still dt.
+  # This only refines numerical integration of the vehicle motion.
+  #
+  # Higher value:
+  # - smoother arcs
+  # - more accurate curvature
+  # - denser collision sampling along the same trajectory
+  #
+  # Does NOT change:
+  # - number of nodes
+  # - branching factor
+  # - step horizon (dt)
   kinematic_substeps: 3
+
+  # Distance (in pixels) between sampled points when constructing analytic (Reeds-Shepp / Dubins)
+  # or hybrid shortcut trajectories.
+  #
+  # Used for:
+  # - discretizing continuous analytic curves into collision-checkable points
+  # - ensuring SAT / grid collision checks are not skipped between sparse samples
+  #
+  # Smaller value:
+  # - higher fidelity
+  # - slower evaluation
+  #
+  # Larger value:
+  # - faster but coarser approximation
   analytic_step_px: 5.0
+
+  # Minimum number of discrete segments ("chunks") required for an analytic path.
+  #
+  # Ensures even very short analytic paths are not under-sampled.
+  # Prevents degenerate cases where a shortcut becomes a single unsafely-large jump.
+  #
+  # Acts as a lower bound on discretization resolution, not a motion parameter.
   min_chunks: 1
 
 numeric:
