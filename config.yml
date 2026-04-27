@@ -25,15 +25,15 @@ animation:
   enable_search_animation: true
   delay_search: 0.0
   delay_snake: 0.0
-  enable_final_path_animation: false
+  enable_final_path_animation: true
   final_path_speed: 2.0
-  search_render_every: 50
+  search_render_every: 100
   snake_render_every: 3
 
 smoothing:
   enabled: true
   min_points: 3
-  iterations: 250
+  iterations: 140
   data_weight: 0.10
   smoothness_weight: 0.60
   obstacle_weight: 0.75
