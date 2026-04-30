@@ -4,7 +4,7 @@ This repository demonstrate the **Hybrid A* algorithm** as the path-planner for 
 
 Check out the technical breakdown here:
 
-- [Blog post (Coming soon)](https://yuk068.github.io/)
+- [Blog post](https://yuk068.github.io/2026/04/26/hybrid-a-star-playground-overview)
 
 <img alt="hybrid a star" src="https://raw.githubusercontent.com/duy-phamduc68/Hyrbid-A-Star-Playground/main/media/example_usage.gif" width="100%">
 
