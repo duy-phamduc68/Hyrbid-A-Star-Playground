@@ -50,16 +50,26 @@ def collides_state(
         if x < 0 or x > cfg.width or y < 0 or y > cfg.height:
             return True
 
+    xs = [p[0] for p in corners]
+    ys = [p[1] for p in corners]
+    car_min_x, car_max_x = min(xs), max(xs)
+    car_min_y, car_max_y = min(ys), max(ys)
+
     for obs_poly in cont_obs_polys:
+        obs_xs = [p[0] for p in obs_poly]
+        obs_ys = [p[1] for p in obs_poly]
+        
+        if (car_max_x < min(obs_xs) or car_min_x > max(obs_xs) or
+            car_max_y < min(obs_ys) or car_min_y > max(obs_ys)):
+            continue
+            
         if sat_check(corners, obs_poly):
             return True
 
-    xs = [p[0] for p in corners]
-    ys = [p[1] for p in corners]
-    min_c = max(0, int(min(xs) // cfg.grid_size) - 1)
-    max_c = min(cfg.cols - 1, int(max(xs) // cfg.grid_size) + 1)
-    min_r = max(0, int(min(ys) // cfg.grid_size) - 1)
-    max_r = min(cfg.rows - 1, int(max(ys) // cfg.grid_size) + 1)
+    min_c = max(0, int(car_min_x // cfg.grid_size) - 1)
+    max_c = min(cfg.cols - 1, int(car_max_x // cfg.grid_size) + 1)
+    min_r = max(0, int(car_min_y // cfg.grid_size) - 1)
+    max_r = min(cfg.rows - 1, int(car_max_y // cfg.grid_size) + 1)
 
     for c in range(min_c, max_c + 1):
         for r in range(min_r, max_r + 1):
