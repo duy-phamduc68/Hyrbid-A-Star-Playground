@@ -59,3 +59,7 @@ Note: If the algorithm hasn't finish searching (pink snake path hasn't been inst
 ## Setup Configuration
 
 You can customize various parameters in `config.yml`.
+
+## Acknowledgement
+
+The Reeds Shepp code was based on [nathanlct/reeds-shepp-curves](https://github.com/nathanlct/reeds-shepp-curves)
